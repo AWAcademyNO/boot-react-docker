@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @SpringBootApplication
 @RestController
 public class SampleApplication {
@@ -12,6 +14,11 @@ public class SampleApplication {
 	@GetMapping("/api/greet")
 	public String greetings() {
 		return "Hello from Spring Boot";
+	}
+
+	@GetMapping("/user")
+	public Principal user(Principal p) {
+		return p;
 	}
 
 	public static void main(String[] args) {

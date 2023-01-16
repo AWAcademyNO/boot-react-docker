@@ -1,35 +1,37 @@
 import './App.css';
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
+import Login from "./Login";
+
+const DEFAULT_MSG = "Message..."
+
 function App() {
-  const [message, setMessage] = useState("Loading message...")
-  const [login, setLogin] = useState(false)
-  useEffect(() => {
-    const loadData = async () => {
-      const res = await fetch('/api/greet', {redirect: "manual"})
-      if (res.status === 0) {
-        setLogin(true)
-        setMessage('Could not load message - perhaps not logged in?')
-      } else {
-        const greeting = await res.text()
-        setMessage(greeting)
-      }
-    }
+    const [message, setMessage] = useState(DEFAULT_MSG);
+    const [user, setUser] = useState(null);
 
-    loadData()
-        .catch(console.error)
-  }, [])
+    useEffect(() => {
+        const loadData = async () => {
+            const res = await fetch('/api/greet')
+            const greet = await res.text()
+            setMessage(greet)
+        }
+        if (user !== null) {
+            setMessage("Loading Message...")
+            loadData()
+                .catch(console.error)
+        } else {
+            setMessage(DEFAULT_MSG)
+        }
 
-  return (
-    <div className="App">
-      <h1>{message}</h1>
-      {login ?
-      <form method='post' action='/login'>
-        <input type='text' name='username' placeholder='Username' />
-        <input type='text' name='password' placeholder='Password' />
-        <input type='submit' name='login' value='Login' />
-      </form> : (<></>)}
-    </div>
-  );
+    }, [user]);
+
+    const updateUser = useCallback((u) => setUser(u), []);
+
+    return (
+        <div className="App">
+            <h1>{message}</h1>
+            <Login user={user} loggedIn={updateUser}/>
+        </div>
+    );
 }
 
 export default App;
